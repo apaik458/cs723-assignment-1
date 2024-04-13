@@ -11,21 +11,9 @@
 // Source includes
 #include "queues.h"
 #include "tasks.h"
+#include "interrupts.h"
 
-void FreqAnalyserISR(void* context, alt_u32 id)
-{
-	;
-}
 
-void ButtonISR(void* context, alt_u32 id)
-{
-	;
-}
-
-void KeyISR(void* context, alt_u32 id)
-{
-	;
-}
 
 /*
  * Create the demo tasks then start the scheduler.
