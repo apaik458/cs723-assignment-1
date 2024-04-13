@@ -1,51 +1,49 @@
-/* Standard includes. */
+// Standard includes
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
-/* Scheduler includes. */
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/queue.h"
+// System includes
+#include "system.h"
+#include <altera_avalon_pio_regs.h>
+#include "sys/alt_irq.h"
 
-/* The parameters passed to the reg test tasks.  This is just done to check
- the parameter passing mechanism is working correctly. */
-#define mainREG_TEST_1_PARAMETER    ( ( void * ) 0x12345678 )
-#define mainREG_TEST_2_PARAMETER    ( ( void * ) 0x87654321 )
-#define mainREG_TEST_PRIORITY       ( tskIDLE_PRIORITY + 1)
-static void prvFirstRegTestTask(void *pvParameters);
-static void prvSecondRegTestTask(void *pvParameters);
+// Source includes
+#include "queues.h"
+#include "tasks.h"
+
+void FreqAnalyserISR(void* context, alt_u32 id)
+{
+	;
+}
+
+void ButtonISR(void* context, alt_u32 id)
+{
+	;
+}
+
+void KeyISR(void* context, alt_u32 id)
+{
+	;
+}
 
 /*
  * Create the demo tasks then start the scheduler.
  */
-int main(void)
+int main(int argc, char* argv[], char* envp[])
 {
-	/* The RegTest tasks as described at the top of this file. */
-	xTaskCreate( prvFirstRegTestTask, "Rreg1", configMINIMAL_STACK_SIZE, mainREG_TEST_1_PARAMETER, mainREG_TEST_PRIORITY, NULL);
-	xTaskCreate( prvSecondRegTestTask, "Rreg2", configMINIMAL_STACK_SIZE, mainREG_TEST_2_PARAMETER, mainREG_TEST_PRIORITY, NULL);
+	int buttonValue = 0;
 
-	/* Finally start the scheduler. */
+	initOSDataStructs();
+	initCreateTasks();
 	vTaskStartScheduler();
 
-	/* Will only reach here if there is insufficient heap available to start
-	 the scheduler. */
-	for (;;);
-}
-static void prvFirstRegTestTask(void *pvParameters)
-{
-	while (1)
-	{
-		printf("Task 1\n");
-		vTaskDelay(1000);
-	}
+	// Register the IRQs
+  	alt_irq_register(ONCHIP_MEMORY_IRQ, (void*)&buttonValue, FreqAnalyserISR);
+	alt_irq_register(PUSH_BUTTON_IRQ, (void*)&buttonValue, ButtonISR);
+	alt_irq_register(PS2_IRQ, (void*)&buttonValue, KeyISR);
 
-}
-static void prvSecondRegTestTask(void *pvParameters)
-{
-	while (1)
-	{
-		printf("Task 2\n");
-		vTaskDelay(1000);
-	}
+	for (;;);
+
+	return 0;
 }

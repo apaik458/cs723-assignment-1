@@ -151,6 +151,15 @@ C_SRCS += freertos/port.c
 C_SRCS += freertos/queue.c
 C_SRCS += freertos/tasks.c
 C_SRCS += freertos/timers.c
+C_SRCS += queues.c
+C_SRCS += tasks.c
+C_SRCS += tasks/stabilityMonitorTask.c
+C_SRCS += tasks/shouldShedTask.c
+C_SRCS += tasks/shouldReconnectTask.c
+C_SRCS += tasks/loadCtrlTask.c
+C_SRCS += tasks/switchPollingTask.c
+C_SRCS += tasks/ledTask.c
+C_SRCS += tasks/vgaTask.c
 CXX_SRCS :=
 ASM_SRCS := freertos/port_asm.S
 
