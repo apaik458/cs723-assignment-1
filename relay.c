@@ -27,9 +27,9 @@
 
 /* The parameters passed to the reg test tasks.  This is just done to check
  the parameter passing mechanism is working correctly. */
-#define mainREG_TEST_1_PARAMETER    ((void *) 0x12345678)
-#define NULL                        ((void *) 0x87654321)
-#define mainREG_TEST_PRIORITY       (tskIDLE_PRIORITY + 1)
+#define mainREG_TEST_1_PARAMETER ((void *) 0x12345678)
+#define NULL                     ((void *) 0x87654321)
+#define mainREG_TEST_PRIORITY    (tskIDLE_PRIORITY + 1)
 
 // Definition of Message Queue
 #define MSG_QUEUE_SIZE 30
@@ -72,8 +72,14 @@ void KeyISR(void* context, alt_u32 id)
 	;
 }
 
+// Local Function Prototypes
+int initOSDataStructs(void);
+int initCreateTasks(void);
+
 int main(int argc, char* argv[], char* envp[])
 {
+	int buttonValue = 0;
+
 	initOSDataStructs();
 	initCreateTasks();
 	vTaskStartScheduler();
