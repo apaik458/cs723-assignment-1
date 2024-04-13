@@ -142,9 +142,17 @@ ACDS_VERSION := 18.1
 ELF := relay.elf
 
 # Paths to C, C++, and assembly source files.
-C_SRCS := hello_world.c
+C_SRCS += main.c
+C_SRCS += freertos/croutine.c
+C_SRCS += freertos/event_groups.c
+C_SRCS += freertos/heap.c
+C_SRCS += freertos/list.c
+C_SRCS += freertos/port.c
+C_SRCS += freertos/queue.c
+C_SRCS += freertos/tasks.c
+C_SRCS += freertos/timers.c
 CXX_SRCS :=
-ASM_SRCS :=
+ASM_SRCS := freertos/port_asm.S
 
 
 # Path to root of object file tree.
