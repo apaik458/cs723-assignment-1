@@ -8,6 +8,8 @@
 #ifndef SWITCHPOLLINGTASK_H_
 #define SWITCHPOLLINGTASK_H_
 
+#define LOAD_SWITCH_MASK ((0b1 << 5) - 1)
+
 void switchPollingTask(void *pvParameters);
 
 #endif /* SWITCHPOLLINGTASK_H_ */
