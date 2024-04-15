@@ -2,48 +2,37 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 // System includes
 #include "system.h"
 #include <altera_avalon_pio_regs.h>
 #include "sys/alt_irq.h"
+#include "io.h"
 
 // Source includes
-#include "queues.h"
 #include "tasks.h"
+#include "queues.h"
 
-void FreqAnalyserISR(void* context, alt_u32 id)
-{
-	;
+void FreqAnalyserISR() {
+	#define SAMPLING_FREQ 16000.0
+	double temp = SAMPLING_FREQ / (double)IORD(FREQUENCY_ANALYSER_BASE, 0);
+
+	xQueueSendToBackFromISR(newFreqQ, &temp, pdFALSE);
+
+	return;
 }
 
-void ButtonISR(void* context, alt_u32 id)
+int main()
 {
-	;
-}
-
-void KeyISR(void* context, alt_u32 id)
-{
-	;
-}
-
-/*
- * Create the demo tasks then start the scheduler.
- */
-int main(int argc, char* argv[], char* envp[])
-{
-	int buttonValue = 0;
-
 	initOSDataStructs();
 	initCreateTasks();
+	alt_irq_register(FREQUENCY_ANALYSER_IRQ, 0, FreqAnalyserISR);
 	vTaskStartScheduler();
 
-	// Register the IRQs
-  	alt_irq_register(ONCHIP_MEMORY_IRQ, (void*)&buttonValue, FreqAnalyserISR);
-	alt_irq_register(PUSH_BUTTON_IRQ, (void*)&buttonValue, ButtonISR);
-	alt_irq_register(PS2_IRQ, (void*)&buttonValue, KeyISR);
-
-	for (;;);
+	while (1) {
+		;
+	}
 
 	return 0;
 }
