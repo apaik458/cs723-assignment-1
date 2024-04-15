@@ -13,12 +13,14 @@
 #include "freertos/queue.h"
 #include "freertos/semphr.h"
 
+#define RECONNECT 0 // A reconnect message in reconnectOrShedQ
+#define SHED 1 // A shed message in reconnectOrShedQ
+
 // Definition of Message Queue
 #define MSG_QUEUE_SIZE 30
 QueueHandle_t newFreqQ;
 QueueHandle_t isStableQ;
-QueueHandle_t shedQ;
-QueueHandle_t reconnectQ;
+QueueHandle_t reconnectOrShedQ;
 QueueHandle_t freqMeasureQ;
 QueueHandle_t keyPressQ;
 QueueHandle_t switchStateQ;

@@ -13,8 +13,7 @@ int initOSDataStructs(void)
 	newFreqQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(void*));
 	freqMeasureQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(void*));
 	isStableQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(void*));
-	shedQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(void*));
-	reconnectQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(void*));
+	reconnectOrShedQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(void*));
 	switchStateQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(void*));
 	keyPressQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(void*));
 	maintenanceQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(void*));

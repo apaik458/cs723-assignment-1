@@ -16,13 +16,13 @@
 #define TASK_STACKSIZE ( 4096 )
 
 // Definition of Task Priorities
-#define STABILITYMONITORTASK_PRIORITY 1
-#define SHOULDSHEDTASK_PRIORITY       1
-#define SHOULDRECONNECTTASK_PRIORITY  1
-#define LOADCTRLTASK_PRIORITY         1
+#define STABILITYMONITORTASK_PRIORITY 5
+#define SHOULDSHEDTASK_PRIORITY       5
+#define SHOULDRECONNECTTASK_PRIORITY  5
+#define LOADCTRLTASK_PRIORITY         4
 #define SWITCHPOLLINGTASK_PRIORITY    1
-#define LEDTASK_PRIORITY              ( tskIDLE_PRIORITY + 1)
-#define VGATASK_PRIORITY              1
+#define LEDTASK_PRIORITY              4
+#define VGATASK_PRIORITY              4
 
 /* The parameters passed to the reg test tasks.  This is just done to check
  the parameter passing mechanism is working correctly. */

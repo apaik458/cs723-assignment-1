@@ -12,23 +12,24 @@
 #include "../freertos/task.h"
 
 #include "../queues.h"
+
 #include "switchPollingTask.h"
 
 /*
- * Task to pollsSW[4..0] for changes, and send a message to loadCtrlTask.
+ * Task to poll SW[4..0] for changes, and send a message to loadCtrlTask.
  */
 void switchPollingTask(void *pvParameters) {
-	unsigned int switchValue = 0;
-	unsigned int prevSwitchValue = 0;
+	unsigned int switchState = 0;
+	unsigned int prevSwitchState = 0;
 
 	while (1) {
-		switchValue = IORD_ALTERA_AVALON_PIO_DATA(SLIDE_SWITCH_BASE) & LOAD_SWITCH_MASK;
+		switchState = IORD_ALTERA_AVALON_PIO_DATA(SLIDE_SWITCH_BASE) & LOAD_SWITCH_MASK;
 
-		if (switchValue != prevSwitchValue) {
+		if (switchState != prevSwitchState) {
 			// Switch changed, send state message
-			if (xQueueSend(switchStateQ, (void *)&switchValue, 0) == pdPASS) {
+			if (xQueueSend(switchStateQ, (void *)&switchState, 0) == pdPASS) {
 				// Added to message queue
-				prevSwitchValue = switchValue;
+				prevSwitchState = switchState;
 			}
 		}
 
