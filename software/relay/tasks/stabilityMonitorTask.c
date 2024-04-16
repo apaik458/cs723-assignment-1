@@ -8,14 +8,13 @@
 #include <stdint.h>
 
 #include "../freertos/FreeRTOS.h"
-#include "../freertos/task.h"
 #include "../queues.h"
 #include "../globals.h"
 
 #include "stabilityMonitorTask.h"
 #include "defines.h"
 
-uint8_t currentStable = 2; // start with invalid stability to force update
+uint8_t currentStable = -1; // start with invalid stability to force update
 
 void stabilityMonitorTask(void *pvParameters)
 {
@@ -29,15 +28,17 @@ void stabilityMonitorTask(void *pvParameters)
 
 			// if stability has changed set the global variable
 			if (isStable != currentStable) {
-				if (xSemaphoreTake(xisStableMutex, portMAX_DELAY) == pdPASS) {
-
-					printf("Stability is now %i with a freq of %.3f\r\n", isStable, instantFreq);
-					xSemaphoreGive(xisStableMutex);
-				}
+				printf("\r\nStability is now %i with a freq of %.2f", isStable, instantFreq); //
 				
+				if (xSemaphoreTake(xisStableMutex, portMAX_DELAY) == pdPASS) {
+					xisStable = isStable; // Set the global variale
+				}
+				xSemaphoreGive(xisStableMutex);
+			
 				// update current state
 				currentStable = isStable;
 			}
+			
 		}
 	}
 }
