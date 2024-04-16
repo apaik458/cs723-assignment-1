@@ -10,7 +10,7 @@
 // This function creates the message queues and semaphores
 int initOSDataStructs(void)
 {
-	newFreqQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(void*));
+	newFreqQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(double));
 	freqMeasureQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(void*));
 	isStableQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(void*));
 	reconnectOrShedQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(void*));
