@@ -33,5 +33,6 @@ TaskHandle_t xHandle; // Used to delete a tasks
 
 // Define thresholds
 #define THRESHOLD_FREQUENCY 49.0
+#define THRESHOLD_ROC_FREQUENCY -0.5
 
 #endif /* DEFINES_H_ */

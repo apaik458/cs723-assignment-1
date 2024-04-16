@@ -27,13 +27,18 @@ void shouldReconnectTask(void *pvParameters)
 
 		if ( currentlyStable == 1) {
 			// Stable and should start timer
+			// TODO: switch from delay to proper timer, this should be fine for the demo though
 			vTaskDelay(pdMS_TO_TICKS(500));
 			if (xSemaphoreTake(xisStableMutex, portMAX_DELAY) == pdPASS) {
 				currentlyStable = xisStable;
 				xSemaphoreGive(xisStableMutex);
 			}
+
+			// If it's still stable start reconnecting
 			if (currentlyStable == 1) {
-				xQueueSend(reconnectOrShedQ, RECONNECT, 0);
+				if (xQueueSend(reconnectOrShedQ, RECONNECT, 0) == pdPASS){
+					// printf("YESS"); // used to confirm that it's being sent
+				}
 				printf("R");
 			}
 		} else {

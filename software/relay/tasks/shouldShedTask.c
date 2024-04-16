@@ -30,6 +30,7 @@ void shouldShedTask(void *pvParameters)
 			printf("S");
 
 			// Start timer do delay next (potential) shedding by 500ms
+			// TODO: switch from delay to proper timer, this should be fine for the demo though
 			vTaskDelay(pdMS_TO_TICKS(500));
 		} else {
 			// else wait for 5 ms cause not being too greedy

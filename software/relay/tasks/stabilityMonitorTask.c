@@ -14,29 +14,55 @@
 #include "stabilityMonitorTask.h"
 #include "defines.h"
 
-uint8_t currentStable = -1; // start with invalid stability to force update
 
 void stabilityMonitorTask(void *pvParameters)
 {
-	double instantFreq;
+	uint8_t currentStable = -1; // start with invalid stability to force update
+	double prevFreq = -1;
+	double instantFreq = -1;
+
+	TickType_t prevTick = xTaskGetTickCount();
+	TickType_t currentTick;
 
 	for (;;) { 
 		// Check if there's something in the queue
 		if (xQueueReceive(newFreqQ, &instantFreq , 0) == pdPASS) {
-			// check if frequency is stable
-			uint8_t isStable = instantFreq > THRESHOLD_FREQUENCY ? 1 : 0;
+			// Get Tick
+			currentTick = xTaskGetTickCount();
+
+
+			// check if frequency above threshold
+			uint8_t frequency_stable = instantFreq > THRESHOLD_FREQUENCY ? 1 : 0;
+
+
+
+			// Get ROC
+			float timeDifference = (currentTick - prevTick)/(float)configTICK_RATE_HZ;
+			float freqROC = (instantFreq-prevFreq) /timeDifference;
+
+			// handle first loop where prevFreq is unset
+			if (prevFreq == -1)
+			{
+				freqROC = 0;
+			}
+			//Check ROC in bounds
+			uint8_t rateOfChangeStabe = freqROC > THRESHOLD_ROC_FREQUENCY ? 1 : 0;
+
+			uint8_t isStable = frequency_stable && rateOfChangeStabe;
 
 			// if stability has changed set the global variable
 			if (isStable != currentStable) {
-				printf("\r\nStability is now %i with a freq of %.2f", isStable, instantFreq); //
+				printf("\r\nStability is now %i with a freq of %.2f and ROC of %.3f", isStable, instantFreq, freqROC); //
 				
 				if (xSemaphoreTake(xisStableMutex, portMAX_DELAY) == pdPASS) {
-					xisStable = isStable; // Set the global variale
+					xisStable = isStable; // Set the global variable
 				}
 				xSemaphoreGive(xisStableMutex);
 			
 				// update current state
 				currentStable = isStable;
+				prevFreq = instantFreq;
+
 			}
 			
 		}
