@@ -102,6 +102,10 @@ void loadCtrlTask(void *pvParameters) {
 					if (instabilityTick != -1) {
 						uint16_t reactionTimeMS =  ((uint16_t)xTaskGetTickCount() - (uint16_t)instabilityTick)/(float)configTICK_RATE_HZ *1000;
 						printf("Reaction Time: %dms | %d\n", reactionTimeMS, (uint16_t)instabilityTick);
+						if (xQueueSend(latencyQ, &reactionTimeMS, 0) != pdPASS) {
+							// Send Failed
+							printf("ERROR: latencyQ Send Fail");
+						}
 
 					}
 
