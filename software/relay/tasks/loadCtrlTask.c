@@ -123,7 +123,8 @@ void loadCtrlTask(void *pvParameters) {
 				// Must update load state
 				connectedLoads = switchState & ~shedLoads & ((0b1 << 5) - 1);
 
-				if (xQueueSend(loadCtrlQ, &connectedLoads, 0) == pdPASS) {
+				if (xQueueSend(loadCtrlQ, &connectedLoads, 0) == pdPASS
+						&& xQueueSend(vgaLoadsQ, &connectedLoads, 0) == pdPASS) {
 					// Load states updated, update previous values so another loadCtrlQ isn't sent
 					prevShedLoads = shedLoads;
 				}
