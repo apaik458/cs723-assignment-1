@@ -24,11 +24,11 @@ QueueHandle_t reconnectOrShedQ;
 QueueHandle_t freqMeasureQ;
 QueueHandle_t keyPressQ;
 QueueHandle_t switchStateQ;
-QueueHandle_t maintenanceQ;
 QueueHandle_t loadCtrlQ;
 
+SemaphoreHandle_t xisStableMutex;
 SemaphoreHandle_t shared_resource_sem; // Definition of Semaphore
 
-int initOSDataStructs(void);
+void initOSDataStructs(void);
 
 #endif /* QUEUES_H_ */

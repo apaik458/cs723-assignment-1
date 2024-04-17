@@ -20,7 +20,7 @@
 #define SHOULDSHEDTASK_PRIORITY       5
 #define SHOULDRECONNECTTASK_PRIORITY  5
 #define LOADCTRLTASK_PRIORITY         4
-#define SWITCHPOLLINGTASK_PRIORITY    1
+#define SWITCHPOLLINGTASK_PRIORITY    10
 #define LEDTASK_PRIORITY              4
 #define VGATASK_PRIORITY              4
 
@@ -34,5 +34,7 @@ TaskHandle_t xHandle; // Used to delete a tasks
 // Define thresholds
 #define THRESHOLD_FREQUENCY 49.0
 #define THRESHOLD_ROC_FREQUENCY -0.5
+
+#define LOAD_MASK ((0b1 << 5) - 1)
 
 #endif /* DEFINES_H_ */

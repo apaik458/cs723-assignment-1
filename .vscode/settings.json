@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "queues.h": "c",
+    "globals.h": "c",
+    "altera_avalon_pio_regs.h": "c"
+  }
+}

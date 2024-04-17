@@ -4,9 +4,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 
-extern uint8_t xisStable;
-extern SemaphoreHandle_t xisStableMutex;
+uint8_t isMaintenanceState;
+uint8_t xisStable;
 
-
+void initGlobals();
 
 #endif

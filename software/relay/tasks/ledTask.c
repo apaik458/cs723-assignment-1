@@ -11,9 +11,14 @@
 #include <altera_avalon_pio_regs.h>
 
 #include "../queues.h"
+#include "defines.h"
 
 #include "ledTask.h"
 
+/**
+ * Use red LEDs to display loads which are connected, and green to show loads
+ * which are shed.
+ */
 void ledTask(void *pvParameters)
 {
 	unsigned int loadCtrl = 0;
@@ -21,10 +26,10 @@ void ledTask(void *pvParameters)
 	while (1)
 	{
 		if (xQueueReceive(loadCtrlQ, &loadCtrl, 0) == pdPASS) {
-			printf("ledTask\n");
-		    IOWR_ALTERA_AVALON_PIO_DATA(GREEN_LEDS_BASE, loadCtrl);
-		    IOWR_ALTERA_AVALON_PIO_DATA(RED_LEDS_BASE, ~loadCtrl);
+		    IOWR_ALTERA_AVALON_PIO_DATA(RED_LEDS_BASE, loadCtrl);
+		    IOWR_ALTERA_AVALON_PIO_DATA(GREEN_LEDS_BASE, (~loadCtrl & LOAD_MASK));
 		}
+
 		vTaskDelay(20);
 	}
 }

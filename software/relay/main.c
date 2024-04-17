@@ -16,21 +16,18 @@
 
 #define KEY_3(X) (X >> 2) & 0b1
 
-uint8_t xisStable = 1; // default to stable state
 SemaphoreHandle_t xisStableMutex = NULL;
 
 void FreqAnalyserISR(void* context, alt_u32 id) {
 	double temp = SAMPLING_FREQ / (double) IORD(FREQUENCY_ANALYSER_BASE, 0);
-	xQueueSendToBackFromISR(newFreqQ, &temp, pdFALSE);
+	xQueueSendFromISR(newFreqQ, &temp, pdFALSE);
 }
 
 void ButtonISR() {
 	// Send maintenanceQ on KEY3 push
 	unsigned int temp = KEY_3(IORD_ALTERA_AVALON_PIO_EDGE_CAP(PUSH_BUTTON_BASE));
-	if (temp) {
-		xQueueSendToBackFromISR(maintenanceQ, &temp, pdFALSE);
-		printf("maintenanceQ sent");
-	}
+	if (temp)
+		isMaintenanceState = !isMaintenanceState;
 
 	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PUSH_BUTTON_BASE, 0x7); // Clear edge capture register
 }
@@ -45,10 +42,8 @@ void KeyISR(void* context, alt_u32 id) {
 int main(int argc, char* argv[], char* envp[]) {
 	int buttonValue = 0;
 
-	// Create mutexes
-	xisStableMutex = xSemaphoreCreateMutex();
-
 	initOSDataStructs();
+	initGlobals();
 	initCreateTasks();
 
 	// Clear button edge capture register and enable interrupts

@@ -160,6 +160,7 @@ C_SRCS += tasks/loadCtrlTask.c
 C_SRCS += tasks/switchPollingTask.c
 C_SRCS += tasks/ledTask.c
 C_SRCS += tasks/vgaTask.c
+C_SRCS += globals.c
 CXX_SRCS :=
 ASM_SRCS := freertos/port_asm.S
 

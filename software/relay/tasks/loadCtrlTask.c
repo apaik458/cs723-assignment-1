@@ -10,6 +10,7 @@
 #include "../freertos/FreeRTOS.h"
 #include "../freertos/task.h"
 
+#include "../globals.h"
 #include "../queues.h"
 
 #include "loadCtrlTask.h"
@@ -17,9 +18,9 @@
 #define UNSIGNED_INT_SIZE sizeof(unsigned int) * 8
 
 /*
- * Get the position of the highest 1 bit.
+ * Get the position of the most significant high bit.
  */
-int getHighestPriorityBit(unsigned int bits) {
+int mostSignificantHighBit(unsigned int bits) {
 	for (int i = UNSIGNED_INT_SIZE - 1; i >= 0; i--) {
 		if (bits & (1 << i))
 			return i;
@@ -29,9 +30,9 @@ int getHighestPriorityBit(unsigned int bits) {
 }
 
 /*
- * Get the position of the lowest 1 bit.
+ * Get the position of the least significant high bit.
  */
-int getLowestPriorityBit(unsigned int bits) {
+int leastSignificantHighBit(unsigned int bits) {
 	for (int i = 0; i <= UNSIGNED_INT_SIZE - 1; i++) {
 		if (bits & (1 << i))
 			return i;
@@ -44,8 +45,7 @@ int getLowestPriorityBit(unsigned int bits) {
  * Task to respond to maintenance state, switch, and reconnectOrShed changes.
  */
 void loadCtrlTask(void *pvParameters) {
-	unsigned int prevMaintenance = 0;
-	unsigned int maintenance = prevMaintenance;
+	unsigned int prevIsMaintenanceState = 0;
 
 	unsigned int prevSwitchState = 0;
 	unsigned int switchState = prevSwitchState;
@@ -55,21 +55,19 @@ void loadCtrlTask(void *pvParameters) {
 
 	while (1) {
 		xQueueReceive(switchStateQ, &switchState, 0); // Check for switch state update
-		xQueueReceive(maintenanceQ, &maintenance, 0); // Check for maintenance state update
 
-		if (maintenance) {
-			printf("maintenance\n");
+		if (isMaintenanceState) {
 			// Maintenance state, obey switches
-			if (maintenance != prevMaintenance
+			if (isMaintenanceState != prevIsMaintenanceState
 					|| switchState != prevSwitchState) {
 				// Must update load state
 				if (xQueueSend(loadCtrlQ, &switchState, 0) == pdPASS) {
 					// Load states updated, update previous values so another loadCtrlQ isn't sent
-					prevMaintenance = maintenance;
+					prevIsMaintenanceState = isMaintenanceState;
 					prevSwitchState = switchState;
 
-					shedLoads = ~switchState;
-					prevShedLoads = shedLoads;
+					prevShedLoads = 0;
+					shedLoads = prevShedLoads;
 				}
 			}
 		} else {
@@ -78,22 +76,22 @@ void loadCtrlTask(void *pvParameters) {
 
 			unsigned int reconnectOrShed;
 			if (xQueueReceive(reconnectOrShedQ, &reconnectOrShed, 0) == pdPASS) {
-				printf("ros %d ss %d sl %d cl %d\n", reconnectOrShed, switchState, shedLoads, connectedLoads);
 				switch (reconnectOrShed) {
 				case RECONNECT:
 					// Reconnect the highest priority load
 					if (shedLoads) // There are loads available to shed
-						shedLoads &= ~(1 << getHighestPriorityBit(shedLoads));
+						shedLoads &= ~(1 << mostSignificantHighBit(shedLoads));
 					break;
 				case SHED:
 					// Shed the lowest priority load
 					if (connectedLoads) // There are loads available to connect
-						shedLoads |= (1 << getLowestPriorityBit(connectedLoads));
+						shedLoads |= (1
+								<< leastSignificantHighBit(connectedLoads));
 					break;
 				}
 			}
 
-			if (shedLoads != prevShedLoads) {
+			if (shedLoads != prevShedLoads || switchState != prevSwitchState) {
 				// Must update load state
 				connectedLoads = switchState & ~shedLoads;
 
