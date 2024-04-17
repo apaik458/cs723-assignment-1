@@ -18,6 +18,7 @@
 #define KEY_S 0x1b
 #define KEY_L 0x4b
 #define KEY_T 0x2c
+#define KEY_INIT 0xAA 
 
 void vgaTask(void *pvParameters) {
 	//initialize VGA controllers
@@ -143,8 +144,10 @@ void vgaTask(void *pvParameters) {
 				prevMaintenanceState = isMaintenanceState;
 
 				char temp[60];
-
+				
 				switch (keyPress) {
+				case KEY_INIT:
+					keyPress = KEY_S;
 				case KEY_S:
 					alt_up_char_buffer_clear(char_buf);
 					sprintf(temp, "Frequency threshold: %.2f",
