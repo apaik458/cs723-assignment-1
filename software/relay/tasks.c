@@ -31,5 +31,5 @@ void initCreateTasks()
 	xTaskCreate(loadCtrlTask,         "loadCtrlTask",         TASK_STACKSIZE, NULL, LOADCTRLTASK_PRIORITY, NULL);
 	xTaskCreate(switchPollingTask,    "switchPollingTask",    TASK_STACKSIZE, NULL, SWITCHPOLLINGTASK_PRIORITY, NULL);
 	xTaskCreate(ledTask,              "ledTask",              TASK_STACKSIZE, NULL, LEDTASK_PRIORITY, NULL);
-	xTaskCreate(vgaTask,              "vgaTask",              TASK_STACKSIZE, NULL, VGATASK_PRIORITY, NULL);
+	xTaskCreate(vgaTask,			  "vgaTask",			  TASK_STACKSIZE, NULL, VGATASK_PRIORITY, &PRVGADraw);
 }

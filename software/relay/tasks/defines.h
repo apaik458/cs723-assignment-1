@@ -30,6 +30,7 @@
 #define mainREG_TEST_PRIORITY    (tskIDLE_PRIORITY + 1)
 
 TaskHandle_t xHandle; // Used to delete a tasks
+TaskHandle_t PRVGADraw;
 
 // Define thresholds
 #define THRESHOLD_FREQUENCY 49.0
