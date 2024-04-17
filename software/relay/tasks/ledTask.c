@@ -25,6 +25,6 @@ void ledTask(void *pvParameters)
 		    IOWR_ALTERA_AVALON_PIO_DATA(GREEN_LEDS_BASE, loadCtrl);
 		    IOWR_ALTERA_AVALON_PIO_DATA(RED_LEDS_BASE, ~loadCtrl);
 		}
-		vTaskDelay(20);
+//		vTaskDelay(1);
 	}
 }

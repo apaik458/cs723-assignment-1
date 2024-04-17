@@ -26,6 +26,7 @@ QueueHandle_t keyPressQ;
 QueueHandle_t switchStateQ;
 QueueHandle_t maintenanceQ;
 QueueHandle_t loadCtrlQ;
+QueueHandle_t latencyQ;
 
 SemaphoreHandle_t shared_resource_sem; // Definition of Semaphore
 

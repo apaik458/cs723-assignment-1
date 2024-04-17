@@ -76,6 +76,6 @@ void stabilityMonitorTask(void *pvParameters)
 			
 		}
 
-		vTaskDelay(20);
+		vTaskDelay(1);
 	}
 }

@@ -38,6 +38,6 @@ void shouldShedTask(void *pvParameters)
 			vTaskDelay(pdMS_TO_TICKS(5));
 		}
 
-		vTaskDelay(20);
+		vTaskDelay(1);
 	}
 }

@@ -11,13 +11,14 @@
 int initOSDataStructs(void)
 {
 	newFreqQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(double));
-	freqMeasureQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(unsigned int));
+	freqMeasureQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(double)*2); 			// sending 2 doubles
 	isStableQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(unsigned int));
 	reconnectOrShedQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(unsigned int));
 	switchStateQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(unsigned int));
 	keyPressQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(unsigned int));
 	maintenanceQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(unsigned int));
 	loadCtrlQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(unsigned int));
+	latencyQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(unsigned int));
 	shared_resource_sem = xSemaphoreCreateCounting(9999, 1);
 	return 0;
 }

@@ -79,7 +79,7 @@ void loadCtrlTask(void *pvParameters) {
 
 			unsigned int reconnectOrShed;
 			if (xQueueReceive(reconnectOrShedQ, &reconnectOrShed, 0) == pdPASS) {
-				printf("ros %d ss %d sl %d cl %d\n", reconnectOrShed, switchState, shedLoads, connectedLoads);
+				//printf("ros %d ss %d sl %d cl %d\n", reconnectOrShed, switchState, shedLoads, connectedLoads);
 				switch (reconnectOrShed) {
 				case RECONNECT:
 					// Reconnect the highest priority load
@@ -124,6 +124,6 @@ void loadCtrlTask(void *pvParameters) {
 			}
 		}
 
-		vTaskDelay(20);
+//		vTaskDelay(2);
 	}
 }

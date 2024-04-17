@@ -43,10 +43,10 @@ void shouldReconnectTask(void *pvParameters)
 				printf("R");
 			}
 		} else {
-			// else wait for 5 ms cause not being too greedy
-			vTaskDelay(pdMS_TO_TICKS(5));
+//			// else wait for 5 ms cause not being too greedy
+			vTaskDelay(pdMS_TO_TICKS(1));
 		}
 
-		vTaskDelay(20);
+		vTaskDelay(1);
 	}
 }
