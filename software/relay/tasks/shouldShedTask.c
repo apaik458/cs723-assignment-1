@@ -4,17 +4,20 @@
  *  Created on: 13/04/2024
  *      Author: mtay527
  */
+
+// Standard library includes
 #include <stdio.h>
 #include <stdint.h>
 
-#include "shouldShedTask.h"
-#include "../globals.h"
-#include "../queues.h"
-
+// OS includes
 #include "../freertos/FreeRTOS.h"
 #include "../freertos/task.h"
 
+// Source includes
+#include "../globals.h"
+#include "../queues.h"
 
+#include "shouldShedTask.h"
 
 void shouldShedTask(void *pvParameters)
 {

@@ -5,15 +5,19 @@
  *      Author: mtay527
  */
 
-#include "shouldReconnectTask.h"
-#include "../globals.h"
-#include "../queues.h"
+// Standard library includes
+#include <stdio.h>
+#include <stdint.h>
 
+// OS includes
 #include "../freertos/FreeRTOS.h"
 #include "../freertos/task.h"
 
-#include <stdio.h>
-#include <stdint.h>
+// Source includes
+#include "../globals.h"
+#include "../queues.h"
+
+#include "shouldReconnectTask.h"
 
 void shouldReconnectTask(void *pvParameters) {
 	uint8_t currentlyStable = 0;

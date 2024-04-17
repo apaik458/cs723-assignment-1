@@ -5,11 +5,14 @@
  *      Author: mtay527
  */
 
+// Standard library includes
 #include <stdio.h>
 
+// OS includes
 #include "../freertos/FreeRTOS.h"
 #include "../freertos/task.h"
 
+// Source includes
 #include "../globals.h"
 #include "../queues.h"
 

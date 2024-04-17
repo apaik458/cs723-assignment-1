@@ -4,16 +4,20 @@
  *  Created on: 13/04/2024
  *      Author: mtay527
  */
+
+// Standard library includes
 #include <stdio.h>
 #include <stdint.h>
 
+// OS includes
 #include "../freertos/FreeRTOS.h"
-#include "../queues.h"
-#include "../globals.h"
 
-#include "stabilityMonitorTask.h"
+// Source includes
+#include "../globals.h"
+#include "../queues.h"
 #include "defines.h"
 
+#include "stabilityMonitorTask.h"
 
 void stabilityMonitorTask(void *pvParameters)
 {

@@ -5,6 +5,20 @@
  *      Author: mtay527
  */
 
+// OS includes
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+// Source includes
+#include "tasks/defines.h"
+#include "tasks/stabilityMonitorTask.h"
+#include "tasks/shouldShedTask.h"
+#include "tasks/shouldReconnectTask.h"
+#include "tasks/loadCtrlTask.h"
+#include "tasks/switchPollingTask.h"
+#include "tasks/ledTask.h"
+#include "tasks/vgaTask.h"
+
 #include "tasks.h"
 
 // This function creates the tasks used in this example

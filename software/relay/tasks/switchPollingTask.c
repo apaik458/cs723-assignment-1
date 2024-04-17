@@ -5,14 +5,18 @@
  *      Author: mtay527
  */
 
+// Standard library includes
 #include <stdio.h>
 
+// System includes
 #include <system.h>
 #include <altera_avalon_pio_regs.h>
 
+// OS includes
 #include "../freertos/FreeRTOS.h"
 #include "../freertos/task.h"
 
+// Source includes
 #include "../queues.h"
 #include "defines.h"
 

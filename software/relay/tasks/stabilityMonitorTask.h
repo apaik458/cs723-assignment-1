@@ -8,8 +8,6 @@
 #ifndef STABILITYMONITORTASK_H_
 #define STABILITYMONITORTASK_H_
 
-
-
 void stabilityMonitorTask(void *pvParameters);
 
 #endif /* STABILITYMONITORTASK_H_ */

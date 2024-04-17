@@ -8,7 +8,7 @@
 #ifndef QUEUES_H_
 #define QUEUES_H_
 
-// Queue includes
+// OS includes
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "freertos/semphr.h"
