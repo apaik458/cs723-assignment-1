@@ -14,6 +14,7 @@
 
 // Source includes
 #include "../queues.h"
+#include "../globals.h"
 #include "defines.h"
 
 #include "ledTask.h"
@@ -28,8 +29,11 @@ void ledTask(void *pvParameters) {
 	while (1) {
 		if (xQueueReceive(loadCtrlQ, &loadCtrl, 0) == pdPASS) {
 			IOWR_ALTERA_AVALON_PIO_DATA(RED_LEDS_BASE, loadCtrl);
-			IOWR_ALTERA_AVALON_PIO_DATA(GREEN_LEDS_BASE,
-					(~loadCtrl & LOAD_MASK));
+			if (isMaintenanceState)
+				IOWR_ALTERA_AVALON_PIO_DATA(GREEN_LEDS_BASE, 0);
+			else
+				IOWR_ALTERA_AVALON_PIO_DATA(GREEN_LEDS_BASE,
+						(~loadCtrl & LOAD_MASK));
 		}
 	}
 }
