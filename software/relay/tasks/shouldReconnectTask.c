@@ -36,7 +36,8 @@ void shouldReconnectTask(void *pvParameters)
 
 			// If it's still stable start reconnecting
 			if (currentlyStable == 1) {
-				if (xQueueSend(reconnectOrShedQ, RECONNECT, 0) == pdPASS){
+				unsigned int reconnect = RECONNECT;
+				if (xQueueSend(reconnectOrShedQ, &reconnect, 0) == pdPASS){
 					// printf("YESS"); // used to confirm that it's being sent
 				}
 				printf("R");
@@ -46,5 +47,6 @@ void shouldReconnectTask(void *pvParameters)
 			vTaskDelay(pdMS_TO_TICKS(5));
 		}
 
+		vTaskDelay(20);
 	}
 }
