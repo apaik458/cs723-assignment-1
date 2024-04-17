@@ -77,6 +77,8 @@ void vgaTask(void *pvParameters) {
 	unsigned int prevLoads = 0;
 	unsigned int loads = prevLoads;
 
+	unsigned int prevMaintenanceState = 2;
+
 	unsigned int statusChanged = 0;
 	uint16_t latencyList[5] = { 0, 0, 0, 0, 0 };
 	uint16_t minLatency = 200;
@@ -121,11 +123,25 @@ void vgaTask(void *pvParameters) {
 			xQueueReceive(keyPressQ, &keyPress, 0);
 			xQueueReceive(vgaLoadsQ, &loads, 0);
 
-			if (keyPress != prevKeyPress || loads != prevLoads
-					|| statusChanged) {
+			//calculate frequency RoC
+			if (i == 0) {
+				dfreq[0] = (freq[0] - freq[99]) * 2.0 * freq[0] * freq[99]
+						/ (freq[0] + freq[99]);
+			} else {
+				dfreq[i] = (freq[i] - freq[i - 1]) * 2.0 * freq[i] * freq[i - 1]
+						/ (freq[i] + freq[i - 1]);
+			}
+
+			if (dfreq[i] > 100.0) {
+				dfreq[i] = 100.0;
+			}
+
+			if (keyPress != prevKeyPress || loads != prevLoads || statusChanged
+					|| isMaintenanceState != prevMaintenanceState) {
 				prevKeyPress = keyPress;
 				prevLoads = loads;
 				statusChanged = 0;
+				prevMaintenanceState = isMaintenanceState;
 
 				char temp[60];
 
@@ -140,6 +156,17 @@ void vgaTask(void *pvParameters) {
 					alt_up_char_buffer_string(char_buf, temp, 10, 45);
 					alt_up_char_buffer_string(char_buf, "System status", 50,
 							41);
+
+					// Display system state
+					if (isMaintenanceState) {
+						alt_up_char_buffer_string(char_buf, "Maintenance", 52,
+								45);
+					} else if (freq[i] < THRESHOLD_FREQUENCY
+							|| dfreq[i] < THRESHOLD_ROC_FREQUENCY) {
+						alt_up_char_buffer_string(char_buf, "Unstable", 53, 45);
+					} else {
+						alt_up_char_buffer_string(char_buf, "Stable", 54, 45);
+					}
 					break;
 				case KEY_L:
 					alt_up_char_buffer_clear(char_buf);
@@ -201,20 +228,6 @@ void vgaTask(void *pvParameters) {
 				alt_up_char_buffer_string(char_buf, "'l' - loads", 34, 57);
 				alt_up_char_buffer_string(char_buf, "'t' - time", 63, 57);
 			}
-
-			//calculate frequency RoC
-			if (i == 0) {
-				dfreq[0] = (freq[0] - freq[99]) * 2.0 * freq[0] * freq[99]
-						/ (freq[0] + freq[99]);
-			} else {
-				dfreq[i] = (freq[i] - freq[i - 1]) * 2.0 * freq[i] * freq[i - 1]
-						/ (freq[i] + freq[i - 1]);
-			}
-
-			if (dfreq[i] > 100.0) {
-				dfreq[i] = 100.0;
-			}
-
 			i = ++i % 100; //point to the next data (oldest) to be overwritten
 		}
 
