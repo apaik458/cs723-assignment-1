@@ -234,7 +234,7 @@ void vgaTask(void *pvParameters) {
 		alt_up_pixel_buffer_dma_draw_box(pixel_buf, 101, 0, 639, 199, 0, 0);
 		alt_up_pixel_buffer_dma_draw_box(pixel_buf, 101, 201, 639, 299, 0, 0);
 
-		for (j = 0; j < 99; ++j) { //i here points to the oldest data, j loops through all the data to be drawn on VGA
+		for (j = 1; j < 99; ++j) { //i here points to the oldest data, j loops through all the data to be drawn on VGA
 			if (((int) (freq[(i + j) % 100]) > MIN_FREQ)
 					&& ((int) (freq[(i + j + 1) % 100]) > MIN_FREQ)) {
 				//Calculate coordinates of the two data points to draw a line in between

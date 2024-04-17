@@ -40,6 +40,8 @@ void stabilityMonitorTask(void *pvParameters) {
 
 			// Get ROC
 			freqROC = (instantFreq - prevFreq) * 2.0 * instantFreq * prevFreq / (instantFreq + prevFreq);
+
+			//Debounce ROC (if it stays negative then shouldn't switch back to stable
 			if (prevFreqROC < 0 && freqROC < 0){
 				freqROC = prevFreqROC;
 			}
