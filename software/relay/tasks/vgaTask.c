@@ -77,31 +77,32 @@ void vgaTask(void *pvParameters) {
 	unsigned int prevLoads = 0;
 	unsigned int loads = prevLoads;
 
-	uint16_t latencyList[5] = {0,0,0,0,0};
+	unsigned int statusChanged = 0;
+	uint16_t latencyList[5] = { 0, 0, 0, 0, 0 };
 	uint16_t minLatency = 200;
 	uint16_t maxLatency = 0;
-	uint32_t averageTotal = 0;
 	uint16_t averageLatency = 0;
-	uint16_t receivedLatency = 0;
 	uint16_t systemUptime = 0;
 
+	uint32_t averageTotal = 0;
+	uint16_t receivedLatency = 0;
 
 	while (1) {
-		systemUptime = xTaskGetTickCount()/1000;
+		systemUptime = xTaskGetTickCount() / 1000;
 		//recieve load data from queue
 		while (uxQueueMessagesWaiting(latencyQ) != 0) {
+			statusChanged = 1;
 			unsigned int tempLatency;
 			xQueueReceive(latencyQ, &tempLatency, 0);
 
 			// Update Latency List
 			printf("Latencies: ");
-			for (int8_t i = 4; i < 1; i--){
-				latencyList[i] = latencyList[i-1];
-				prinf(" %d,", latencyList[i]);
+			for (int8_t i = 4; i < 1; i--) {
+				latencyList[i] = latencyList[i - 1];
+				printf(" %d,", latencyList[i]);
 			}
 			latencyList[0] = tempLatency;
-			prinf(" %d\n", latencyList[0]);
-
+			printf(" %d\n", latencyList[0]);
 
 			// Update min, max, avg
 			if (tempLatency < minLatency)
@@ -110,8 +111,8 @@ void vgaTask(void *pvParameters) {
 				maxLatency = tempLatency;
 
 			averageTotal += tempLatency;
-			receivedLatency++;   
-			averageLatency = averageTotal/receivedLatency;
+			receivedLatency++;
+			averageLatency = averageTotal / receivedLatency;
 		}
 
 		//receive frequency data from queue
@@ -120,14 +121,17 @@ void vgaTask(void *pvParameters) {
 			xQueueReceive(keyPressQ, &keyPress, 0);
 			xQueueReceive(vgaLoadsQ, &loads, 0);
 
-			if (keyPress != prevKeyPress || loads != prevLoads) {
+			if (keyPress != prevKeyPress || loads != prevLoads
+					|| statusChanged) {
 				prevKeyPress = keyPress;
 				prevLoads = loads;
+				statusChanged = 0;
+
+				char temp[60];
 
 				switch (keyPress) {
 				case KEY_S:
 					alt_up_char_buffer_clear(char_buf);
-					char temp[30];
 					sprintf(temp, "Frequency threshold: %.2f",
 					THRESHOLD_FREQUENCY);
 					alt_up_char_buffer_string(char_buf, temp, 10, 41);
@@ -157,16 +161,23 @@ void vgaTask(void *pvParameters) {
 					break;
 				case KEY_T:
 					alt_up_char_buffer_clear(char_buf);
-					alt_up_char_buffer_string(char_buf,
-							"5 most recent measurements: ", 10, 41);
-					alt_up_char_buffer_string(char_buf, "Minimum time taken: ",
-							10, 43);
-					alt_up_char_buffer_string(char_buf, "Maximum time taken: ",
-							10, 45);
-					alt_up_char_buffer_string(char_buf, "Average time taken: ",
-							10, 47);
-					alt_up_char_buffer_string(char_buf,
-							"Total active system time: ", 10, 49);
+
+					sprintf(temp, "5 most recent measurements: %d %d %d %d %d",
+							latencyList[0], latencyList[1], latencyList[2],
+							latencyList[3], latencyList[4]);
+					alt_up_char_buffer_string(char_buf, temp, 10, 41);
+
+					sprintf(temp, "Minimum time taken: %d", minLatency);
+					alt_up_char_buffer_string(char_buf, temp, 10, 43);
+
+					sprintf(temp, "Maximum time taken: %d", maxLatency);
+					alt_up_char_buffer_string(char_buf, temp, 10, 45);
+
+					sprintf(temp, "Average time taken: %d", averageLatency);
+					alt_up_char_buffer_string(char_buf, temp, 10, 47);
+
+					sprintf(temp, "Total active system time: %d", systemUptime);
+					alt_up_char_buffer_string(char_buf, temp, 10, 49);
 					break;
 				}
 
