@@ -26,6 +26,7 @@ QueueHandle_t keyPressQ;
 QueueHandle_t switchStateQ;
 QueueHandle_t loadCtrlQ;
 QueueHandle_t latencyQ;
+QueueHandle_t vgaLoadsQ;
 
 // Definition of Semaphore
 SemaphoreHandle_t xisStableMutex;

@@ -14,6 +14,11 @@
 
 #include "vgaTask.h"
 #include <stdio.h>
+
+#define KEY_S 0x1b
+#define KEY_L 0x4b
+#define KEY_T 0x2c
+
 void vgaTask(void *pvParameters) {
 	//initialize VGA controllers
 	alt_up_pixel_buffer_dma_dev *pixel_buf;
@@ -62,16 +67,15 @@ void vgaTask(void *pvParameters) {
 	alt_up_char_buffer_string(char_buf, "'l' - loads", 34, 57);
 	alt_up_char_buffer_string(char_buf, "'t' - time", 63, 57);
 
-	alt_up_char_buffer_string(char_buf, "Lower threshold: ", 10, 41);
-	alt_up_char_buffer_string(char_buf, "RoC threshold: ", 10, 45);
-	alt_up_char_buffer_string(char_buf, "System status", 50, 41);
-	alt_up_char_buffer_string(char_buf, "Stable", 54, 45);
-
 	double freq[100], dfreq[100];
 	int i = 99, j = 0;
 	Line line_freq, line_roc;
 
-	unsigned char keyPress;
+	unsigned char prevKeyPress = KEY_S;
+	unsigned char keyPress = prevKeyPress;
+
+	unsigned int prevLoads = 0;
+	unsigned int loads = prevLoads;
 
 	uint16_t latencyList[5] = {0,0,0,0,0};
 	uint16_t minLatency = 200;
@@ -113,43 +117,45 @@ void vgaTask(void *pvParameters) {
 		//receive frequency data from queue
 		while (uxQueueMessagesWaiting(freqMeasureQ) != 0) {
 			xQueueReceive(freqMeasureQ, freq + i, 0);
+			xQueueReceive(keyPressQ, &keyPress, 0);
+			xQueueReceive(vgaLoadsQ, &loads, 0);
 
-			if (uxQueueMessagesWaiting(keyPressQ)) {
-				xQueueReceive(keyPressQ, &keyPress, 0);
+			if (keyPress != prevKeyPress || loads != prevLoads) {
+				prevKeyPress = keyPress;
+				prevLoads = loads;
 
-				if (keyPress == 0x1b) { // 's'
+				switch (keyPress) {
+				case KEY_S:
 					alt_up_char_buffer_clear(char_buf);
 					char temp[30];
 					sprintf(temp, "Frequency threshold: %.2f",
-							THRESHOLD_FREQUENCY);
+					THRESHOLD_FREQUENCY);
 					alt_up_char_buffer_string(char_buf, temp, 10, 41);
 					sprintf(temp, "RoC threshold: %.2f",
-							THRESHOLD_ROC_FREQUENCY);
+					THRESHOLD_ROC_FREQUENCY);
 					alt_up_char_buffer_string(char_buf, temp, 10, 45);
 					alt_up_char_buffer_string(char_buf, "System status", 50,
 							41);
-
-					// Display sytem state
-					// if (isMaintenanceState) {
-					// 	alt_up_char_buffer_string(char_buf, "Maintenance", 52, 45);
-					// } else if ( 40 < THRESHOLD_FREQUENCY){// || freq_roc < roc_threshold) {
-					// 	alt_up_char_buffer_string(char_buf, "Unstable", 53, 45);
-					// } else {
-					// 	alt_up_char_buffer_string(char_buf, "Stable", 54, 45);
-					// }
-				} else if (keyPress == 0x4b) { // 'l'
+					break;
+				case KEY_L:
 					alt_up_char_buffer_clear(char_buf);
-					alt_up_char_buffer_string(char_buf, "Load 1: Active", 10,
+					alt_up_char_buffer_string(char_buf,
+							loads & 0b1 ? "Load 1: Active" : "Load 1: Shed", 10,
 							41);
-					alt_up_char_buffer_string(char_buf, "Load 2: Active", 10,
-							43);
-					alt_up_char_buffer_string(char_buf, "Load 3: Active", 10,
-							45);
-					alt_up_char_buffer_string(char_buf, "Load 4: Active", 10,
-							47);
-					alt_up_char_buffer_string(char_buf, "Load 5: Active", 10,
-							49);
-				} else if (keyPress == 0x2c) { // 't'
+					alt_up_char_buffer_string(char_buf,
+							loads & 0b10 ? "Load 2: Active" : "Load 2: Shed",
+							10, 43);
+					alt_up_char_buffer_string(char_buf,
+							loads & 0b100 ? "Load 3: Active" : "Load 3: Shed",
+							10, 45);
+					alt_up_char_buffer_string(char_buf,
+							loads & 0b1000 ? "Load 4: Active" : "Load 4: Shed",
+							10, 47);
+					alt_up_char_buffer_string(char_buf,
+							loads & 0b10000 ? "Load 5: Active" : "Load 5: Shed",
+							10, 49);
+					break;
+				case KEY_T:
 					alt_up_char_buffer_clear(char_buf);
 					alt_up_char_buffer_string(char_buf,
 							"5 most recent measurements: ", 10, 41);
@@ -161,6 +167,7 @@ void vgaTask(void *pvParameters) {
 							10, 47);
 					alt_up_char_buffer_string(char_buf,
 							"Total active system time: ", 10, 49);
+					break;
 				}
 
 				// Print Frequency Axis

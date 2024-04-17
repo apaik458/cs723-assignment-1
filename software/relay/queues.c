@@ -19,6 +19,7 @@ void initOSDataStructs() {
 	switchStateQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(unsigned int));
 	keyPressQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(unsigned int));
 	loadCtrlQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(unsigned int));
+	vgaLoadsQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(unsigned int));
 
 	// Semaphores
 	xisStableMutex = xSemaphoreCreateMutex();
