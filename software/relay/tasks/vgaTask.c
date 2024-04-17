@@ -80,14 +80,14 @@ void vgaTask(void *pvParameters) {
 	unsigned int prevMaintenanceState = 2;
 
 	unsigned int statusChanged = 0;
-	uint16_t latencyList[5] = { 0, 0, 0, 0, 0 };
-	uint16_t minLatency = 200;
-	uint16_t maxLatency = 0;
-	uint16_t averageLatency = 0;
-	uint16_t systemUptime = 0;
+	unsigned int latencyList[5] = { 0, 0, 0, 0, 0 };
+	unsigned int minLatency = 200;
+	unsigned int maxLatency = 0;
+	float averageLatency = 0;
+	unsigned int systemUptime = 0;
 
-	uint32_t averageTotal = 0;
-	uint16_t receivedLatency = 0;
+	unsigned int averageTotal = 0;
+	unsigned int receivedLatency = 0;
 
 	while (1) {
 		systemUptime = xTaskGetTickCount() / 1000;
@@ -98,23 +98,22 @@ void vgaTask(void *pvParameters) {
 			xQueueReceive(latencyQ, &tempLatency, 0);
 
 			// Update Latency List
-			printf("Latencies: ");
-			for (int8_t i = 4; i < 1; i--) {
+			for (int i = 4; i > 0; i--) {
 				latencyList[i] = latencyList[i - 1];
-				printf(" %d,", latencyList[i]);
 			}
 			latencyList[0] = tempLatency;
-			printf(" %d\n", latencyList[0]);
 
 			// Update min, max, avg
-			if (tempLatency < minLatency)
+			if (tempLatency < minLatency && tempLatency > 0) {
 				minLatency = tempLatency;
-			if (tempLatency > maxLatency)
+			}
+			if (tempLatency > maxLatency){
 				maxLatency = tempLatency;
+			}
 
 			averageTotal += tempLatency;
 			receivedLatency++;
-			averageLatency = averageTotal / receivedLatency;
+			averageLatency = (float)averageTotal / receivedLatency;
 		}
 
 		//receive frequency data from queue
@@ -200,7 +199,7 @@ void vgaTask(void *pvParameters) {
 					sprintf(temp, "Maximum time taken: %d", maxLatency);
 					alt_up_char_buffer_string(char_buf, temp, 10, 45);
 
-					sprintf(temp, "Average time taken: %d", averageLatency);
+					sprintf(temp, "Average time taken: %.2f", averageLatency);
 					alt_up_char_buffer_string(char_buf, temp, 10, 47);
 
 					sprintf(temp, "Total active system time: %d", systemUptime);

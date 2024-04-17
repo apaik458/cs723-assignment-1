@@ -102,12 +102,11 @@ void loadCtrlTask(void *pvParameters) {
 
 					// if it's the first time shedding
 					if (instabilityTick != -1) {
-						uint16_t reactionTimeMS =
-								((uint16_t) xTaskGetTickCount()
-										- (uint16_t) instabilityTick)
-										/ (float) configTICK_RATE_HZ * 1000;
+						unsigned int reactionTimeMS =
+								((unsigned int) xTaskGetTickCount()
+								- (unsigned int) instabilityTick);
 						printf("Reaction Time: %dms | %d\n", reactionTimeMS,
-								(uint16_t) instabilityTick);
+								(unsigned int) instabilityTick);
 						if (xQueueSend(latencyQ, &reactionTimeMS, 0) != pdPASS) {
 							// Send Failed
 							printf("ERROR: latencyQ Send Fail");
