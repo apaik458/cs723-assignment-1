@@ -30,11 +30,8 @@ void stabilityMonitorTask(void *pvParameters)
 			// Get Tick
 			currentTick = xTaskGetTickCount();
 
-
 			// check if frequency above threshold
 			uint8_t frequency_stable = instantFreq > THRESHOLD_FREQUENCY ? 1 : 0;
-
-
 
 			// Get ROC
 			float timeDifference = (currentTick - prevTick)/(float)configTICK_RATE_HZ;
@@ -56,8 +53,17 @@ void stabilityMonitorTask(void *pvParameters)
 				
 				if (xSemaphoreTake(xisStableMutex, portMAX_DELAY) == pdPASS) {
 					xisStable = isStable; // Set the global variable
+					xSemaphoreGive(xisStableMutex);
 				}
-				xSemaphoreGive(xisStableMutex);
+
+				// Check if switching to be unstable
+				if (!isStable) {
+					// Save tick to global variable (used for resposne time calculations)
+					if (xSemaphoreTake(xfirstTickMutex, portMAX_DELAY) == pdPASS) {
+						xfirstTick = currentTick; // Set the global variable
+						xSemaphoreGive(xfirstTickMutex);
+					}
+				}
 			
 				// update current state
 				currentStable = isStable;

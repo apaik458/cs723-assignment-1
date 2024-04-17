@@ -21,7 +21,7 @@ void ledTask(void *pvParameters)
 	while (1)
 	{
 		if (xQueueReceive(loadCtrlQ, &loadCtrl, 0) == pdPASS) {
-			printf("ledTask\n");
+			// printf("ledTask\n");
 		    IOWR_ALTERA_AVALON_PIO_DATA(GREEN_LEDS_BASE, loadCtrl);
 		    IOWR_ALTERA_AVALON_PIO_DATA(RED_LEDS_BASE, ~loadCtrl);
 		}

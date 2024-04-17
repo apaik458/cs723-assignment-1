@@ -19,6 +19,9 @@
 uint8_t xisStable = 1; // default to stable state
 SemaphoreHandle_t xisStableMutex = NULL;
 
+TickType_t xfirstTick = -1;
+SemaphoreHandle_t xfirstTickMutex = NULL;
+
 void FreqAnalyserISR(void* context, alt_u32 id) {
 	double temp = SAMPLING_FREQ / (double) IORD(FREQUENCY_ANALYSER_BASE, 0);
 	xQueueSendToBackFromISR(newFreqQ, &temp, pdFALSE);
@@ -47,6 +50,7 @@ int main(int argc, char* argv[], char* envp[]) {
 
 	// Create mutexes
 	xisStableMutex = xSemaphoreCreateMutex();
+	xfirstTickMutex = xSemaphoreCreateMutex();
 
 	initOSDataStructs();
 	initCreateTasks();

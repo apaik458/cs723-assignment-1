@@ -7,6 +7,7 @@
 extern uint8_t xisStable;
 extern SemaphoreHandle_t xisStableMutex;
 
-
+extern TickType_t xfirstTick;
+extern SemaphoreHandle_t xfirstTickMutex;
 
 #endif

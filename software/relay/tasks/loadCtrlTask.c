@@ -11,6 +11,7 @@
 #include "../freertos/task.h"
 
 #include "../queues.h"
+#include "../globals.h"
 
 #include "loadCtrlTask.h"
 
@@ -89,13 +90,28 @@ void loadCtrlTask(void *pvParameters) {
 					// Shed the lowest priority load
 					if (connectedLoads) // There are loads available to connect
 						shedLoads |= (1 << getLowestPriorityBit(connectedLoads));
+
+					// Get tick where instability is detected
+					TickType_t instabilityTick = 0;
+					if (xSemaphoreTake(xfirstTickMutex, portMAX_DELAY) == pdPASS) {
+						instabilityTick = xfirstTick; // Set the global variable
+						xfirstTick = -1;
+						xSemaphoreGive(xfirstTickMutex);
+					}
+					// if it's the first time shedding
+					if (instabilityTick != -1) {
+						uint16_t reactionTimeMS =  ((uint16_t)xTaskGetTickCount() - (uint16_t)instabilityTick)/(float)configTICK_RATE_HZ *1000;
+						printf("Reaction Time: %dms | %d\n", reactionTimeMS, (uint16_t)instabilityTick);
+
+					}
+
 					break;
 				}
 			}
 
 			if (shedLoads != prevShedLoads) {
 				// Must update load state
-				connectedLoads = switchState & ~shedLoads;
+				connectedLoads = switchState & ~shedLoads & ((0b1 << 5) - 1);
 
 				if (xQueueSend(loadCtrlQ, &connectedLoads, 0) == pdPASS) {
 					// Load states updated, update previous values so another loadCtrlQ isn't sent
