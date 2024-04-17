@@ -27,7 +27,7 @@ void stabilityMonitorTask(void *pvParameters)
 
 	TickType_t prevTick = xTaskGetTickCount();
 	TickType_t currentTick;
-
+	
 	for (;;) { 
 		// Check if there's something in the queue
 		if (xQueueReceive(newFreqQ, &instantFreq , 0) == pdPASS) {
@@ -47,7 +47,7 @@ void stabilityMonitorTask(void *pvParameters)
 				freqROC = 0;
 			}
 			double freqMeasureQData[2] = {instantFreq, freqROC};
-			if (xQueueSend(freqMeasureQ, &freqMeasureQData, 0) != pdPASS) {
+			if (xQueueSend(freqMeasureQ, &instantFreq, 0) != pdPASS) {
 				printf("ERROR: freqMeasureQ Failed to Send\n");
 			}
 			//Check ROC in bounds

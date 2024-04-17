@@ -43,7 +43,7 @@ void shouldReconnectTask(void *pvParameters) {
 					if (xQueueSend(reconnectOrShedQ, &reconnect, 0) == pdPASS) {
 						// printf("YESS"); // used to confirm that it's being sent
 					}
-					printf("R");
+					//printf("R");
 				}
 			} else {
 				// else wait for 5 ms cause not being too greedy

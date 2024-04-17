@@ -8,6 +8,7 @@
 #include "../freertos/FreeRTOS.h"
 #include "../queues.h"
 #include "../globals.h"
+#include "defines.h"
 
 #include <stdio.h>
 
@@ -68,34 +69,30 @@ void vgaTask(void *pvParameters) {
 	unsigned char keyPress;
 
 	while(1) {
-		//receive key press data from queue
-//		while (uxQueueMessagesWaiting(keyPressQ) != 0) {
-//			xQueueReceive(keyPressQ, &keyPress, 0);
-//			alt_up_char_buffer_string(char_buf, (char*)keyPress, 7, 54);
-//		}
-
 		//receive frequency data from queue
-		while (uxQueueMessagesWaiting(newFreqQ) != 0) {
-			xQueueReceive(newFreqQ, freq+i, 0);
+		while (uxQueueMessagesWaiting(freqMeasureQ) != 0) {
+			xQueueReceive(freqMeasureQ, freq+i, 0);
 
 			if (uxQueueMessagesWaiting(keyPressQ)) {
 				xQueueReceive(keyPressQ, &keyPress, 0);
 
 				if (keyPress == 0x1b) { // 's'
 					alt_up_char_buffer_clear(char_buf);
-					alt_up_char_buffer_string(char_buf, "Lower threshold: 49.0", 10, 41);
-					alt_up_char_buffer_string(char_buf, "RoC threshold: -0.5", 10, 45);
+					char temp[30];
+					sprintf(temp, "Frequency threshold: %.2f", THRESHOLD_FREQUENCY);
+					alt_up_char_buffer_string(char_buf, temp, 10, 41);
+					sprintf(temp, "RoC threshold: %.2f", THRESHOLD_ROC_FREQUENCY);
+					alt_up_char_buffer_string(char_buf, temp, 10, 45);
 					alt_up_char_buffer_string(char_buf, "System status", 50, 41);
 
-					alt_up_char_buffer_string(char_buf, "Stable", 54, 45);
-
-//					if (maintenance) {
-//						alt_up_char_buffer_string(char_buf, "Maintenance", 54, 45);
-//					} else if (freq < freq_threshold || freq_roc < roc_threshold) {
-//						alt_up_char_buffer_string(char_buf, "Unstable", 54, 45);
-//					} else {
-//						alt_up_char_buffer_string(char_buf, "Stable", 54, 45);
-//					}
+					// Display sytem state
+					// if (isMaintenanceState) {
+					// 	alt_up_char_buffer_string(char_buf, "Maintenance", 52, 45);
+					// } else if ( 40 < THRESHOLD_FREQUENCY){// || freq_roc < roc_threshold) {
+					// 	alt_up_char_buffer_string(char_buf, "Unstable", 53, 45);
+					// } else {
+					// 	alt_up_char_buffer_string(char_buf, "Stable", 54, 45);
+					// }
 				} else if (keyPress == 0x4b) { // 'l'
 					alt_up_char_buffer_clear(char_buf);
 					alt_up_char_buffer_string(char_buf, "Load 1: Active", 10, 41);
@@ -112,12 +109,14 @@ void vgaTask(void *pvParameters) {
 					alt_up_char_buffer_string(char_buf, "Total active system time: ", 10, 49);
 				}
 
+				// Print Frequency Axis
 				alt_up_char_buffer_string(char_buf, "Frequency(Hz)", 4, 4);
 				alt_up_char_buffer_string(char_buf, "52", 10, 7);
 				alt_up_char_buffer_string(char_buf, "50", 10, 12);
 				alt_up_char_buffer_string(char_buf, "48", 10, 17);
 				alt_up_char_buffer_string(char_buf, "46", 10, 22);
 
+				// Print Frequency RoC Axis
 				alt_up_char_buffer_string(char_buf, "df/dt(Hz/s)", 4, 26);
 				alt_up_char_buffer_string(char_buf, "60", 10, 28);
 				alt_up_char_buffer_string(char_buf, "30", 10, 30);
@@ -125,6 +124,7 @@ void vgaTask(void *pvParameters) {
 				alt_up_char_buffer_string(char_buf, "-30", 9, 34);
 				alt_up_char_buffer_string(char_buf, "-60", 9, 36);
 
+				// Print Menu
 				alt_up_char_buffer_string(char_buf, "'s' - status", 5, 57);
 				alt_up_char_buffer_string(char_buf, "'l' - loads", 34, 57);
 				alt_up_char_buffer_string(char_buf, "'t' - time", 63, 57);

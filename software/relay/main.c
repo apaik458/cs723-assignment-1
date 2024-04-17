@@ -12,6 +12,9 @@
 #include "altera_up_avalon_ps2.h"
 #include "altera_up_ps2_keyboard.h"
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
 // Source includes
 #include "tasks.h"
 #include "queues.h"
@@ -78,7 +81,6 @@ void ps2_isr(void* context, alt_u32 id)
  */
 int main()
 {
-	int buttonValue = 0;
 	lcd = fopen(CHARACTER_LCD_NAME, "w");
 	alt_up_ps2_dev * ps2_device = alt_up_ps2_open_dev(PS2_NAME);
 
@@ -106,7 +108,6 @@ int main()
 	// Register the IRQs
 	alt_irq_register(FREQUENCY_ANALYSER_IRQ, 0, FreqAnalyserISR);
 	alt_irq_register(PUSH_BUTTON_IRQ, 0, ButtonISR);
-	alt_irq_register(PS2_IRQ, (void*)&buttonValue, ps2_isr);
 
 	vTaskStartScheduler();
 
