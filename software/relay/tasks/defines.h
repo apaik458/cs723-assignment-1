@@ -24,17 +24,12 @@
 #define SWITCHPOLLINGTASK_PRIORITY    3
 #define VGATASK_PRIORITY              4
 
-/* The parameters passed to the reg test tasks.  This is just done to check
- the parameter passing mechanism is working correctly. */
-#define mainREG_TEST_1_PARAMETER ((void *) 0x12345678)
-#define mainREG_TEST_PRIORITY    (tskIDLE_PRIORITY + 1)
-
 TaskHandle_t xHandle; // Used to delete a tasks
 TaskHandle_t PRVGADraw;
 
 // Define thresholds
 #define THRESHOLD_FREQUENCY 49.0
-#define THRESHOLD_ROC_FREQUENCY -5.0
+#define THRESHOLD_ROC_FREQUENCY -15.0
 
 #define LOAD_MASK ((0b1 << 5) - 1)
 

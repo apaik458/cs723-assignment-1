@@ -170,19 +170,19 @@ void vgaTask(void *pvParameters) {
 				case KEY_L:
 					alt_up_char_buffer_clear(char_buf);
 					alt_up_char_buffer_string(char_buf,
-							loads & 0b1 ? "Load 1: Active" : "Load 1: Shed", 10,
+							loads & 0b1 ? "Load 1: Active" : "Load 1: Shed/Off", 10,
 							41);
 					alt_up_char_buffer_string(char_buf,
-							loads & 0b10 ? "Load 2: Active" : "Load 2: Shed",
+							loads & 0b10 ? "Load 2: Active" : "Load 2: Shed/Off",
 							10, 43);
 					alt_up_char_buffer_string(char_buf,
-							loads & 0b100 ? "Load 3: Active" : "Load 3: Shed",
+							loads & 0b100 ? "Load 3: Active" : "Load 3: Shed/Off",
 							10, 45);
 					alt_up_char_buffer_string(char_buf,
-							loads & 0b1000 ? "Load 4: Active" : "Load 4: Shed",
+							loads & 0b1000 ? "Load 4: Active" : "Load 4: Shed/Off",
 							10, 47);
 					alt_up_char_buffer_string(char_buf,
-							loads & 0b10000 ? "Load 5: Active" : "Load 5: Shed",
+							loads & 0b10000 ? "Load 5: Active" : "Load 5: Shed/Off",
 							10, 49);
 					break;
 				case KEY_T:
