@@ -73,7 +73,43 @@ void vgaTask(void *pvParameters) {
 
 	unsigned char keyPress;
 
+	uint16_t latencyList[5] = {0,0,0,0,0};
+	uint16_t minLatency = 200;
+	uint16_t maxLatency = 0;
+	uint32_t averageTotal = 0;
+	uint16_t averageLatency = 0;
+	uint16_t receivedLatency = 0;
+	uint16_t systemUptime = 0;
+
+
 	while (1) {
+		systemUptime = xTaskGetTickCount()/1000;
+		//recieve load data from queue
+		while (uxQueueMessagesWaiting(latencyQ) != 0) {
+			unsigned int tempLatency;
+			xQueueReceive(latencyQ, &tempLatency, 0);
+
+			// Update Latency List
+			printf("Latencies: ");
+			for (int8_t i = 4; i < 1; i--){
+				latencyList[i] = latencyList[i-1];
+				prinf(" %d,", latencyList[i]);
+			}
+			latencyList[0] = tempLatency;
+			prinf(" %d\n", latencyList[0]);
+
+
+			// Update min, max, avg
+			if (tempLatency < minLatency)
+				minLatency = tempLatency;
+			if (tempLatency > maxLatency)
+				maxLatency = tempLatency;
+
+			averageTotal += tempLatency;
+			receivedLatency++;   
+			averageLatency = averageTotal/receivedLatency;
+		}
+
 		//receive frequency data from queue
 		while (uxQueueMessagesWaiting(freqMeasureQ) != 0) {
 			xQueueReceive(freqMeasureQ, freq + i, 0);
