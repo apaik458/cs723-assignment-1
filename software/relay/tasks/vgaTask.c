@@ -6,21 +6,25 @@
  */
 
 #include "vgaTask.h"
-
+#include <stdio.h>
 void vgaTask(void *pvParameters) {
 	//initialize VGA controllers
 	alt_up_pixel_buffer_dma_dev *pixel_buf;
 	pixel_buf = alt_up_pixel_buffer_dma_open_dev(VIDEO_PIXEL_BUFFER_DMA_NAME);
-	if(pixel_buf == NULL){
+
+	if (pixel_buf == NULL) {
 		printf("can't find pixel buffer device\n");
 	}
+
 	alt_up_pixel_buffer_dma_clear_screen(pixel_buf, 0);
 
 	alt_up_char_buffer_dev *char_buf;
 	char_buf = alt_up_char_buffer_open_dev("/dev/video_character_buffer_with_dma");
-	if(char_buf == NULL){
+
+	if (char_buf == NULL) {
 		printf("can't find char buffer device\n");
 	}
+
 	alt_up_char_buffer_clear(char_buf);
 
 	//Set up plot axes
@@ -42,25 +46,92 @@ void vgaTask(void *pvParameters) {
 	alt_up_char_buffer_string(char_buf, "-30", 9, 34);
 	alt_up_char_buffer_string(char_buf, "-60", 9, 36);
 
+	alt_up_char_buffer_string(char_buf, "'s' - status", 5, 57);
+	alt_up_char_buffer_string(char_buf, "'l' - loads", 34, 57);
+	alt_up_char_buffer_string(char_buf, "'t' - time", 63, 57);
+
+	alt_up_char_buffer_string(char_buf, "Lower threshold: ", 10, 41);
+	alt_up_char_buffer_string(char_buf, "RoC threshold: ", 10, 45);
+	alt_up_char_buffer_string(char_buf, "System status", 50, 41);
+	alt_up_char_buffer_string(char_buf, "Stable", 54, 45);
+
 	double freq[100], dfreq[100];
 	int i = 99, j = 0;
 	Line line_freq, line_roc;
 
-	while(1){
+	unsigned char keyPress;
+
+	while(1) {
+		//receive key press data from queue
+//		while (uxQueueMessagesWaiting(keyPressQ) != 0) {
+//			xQueueReceive(keyPressQ, &keyPress, 0);
+//			alt_up_char_buffer_string(char_buf, (char*)keyPress, 7, 54);
+//		}
+
 		//receive frequency data from queue
-		while(uxQueueMessagesWaiting( newFreqQ ) != 0){
-			xQueueReceive( newFreqQ, freq+i, 0 );
+		while (uxQueueMessagesWaiting(newFreqQ) != 0) {
+			xQueueReceive(newFreqQ, freq+i, 0);
+
+			if (uxQueueMessagesWaiting(keyPressQ)) {
+				xQueueReceive(keyPressQ, &keyPress, 0);
+
+				if (keyPress == 0x1b) { // 's'
+					alt_up_char_buffer_clear(char_buf);
+					alt_up_char_buffer_string(char_buf, "Lower threshold: 49.0", 10, 41);
+					alt_up_char_buffer_string(char_buf, "RoC threshold: -0.5", 10, 45);
+					alt_up_char_buffer_string(char_buf, "System status", 50, 41);
+
+					alt_up_char_buffer_string(char_buf, "Stable", 54, 45);
+
+//					if (maintenance) {
+//						alt_up_char_buffer_string(char_buf, "Maintenance", 54, 45);
+//					} else if (freq < freq_threshold || freq_roc < roc_threshold) {
+//						alt_up_char_buffer_string(char_buf, "Unstable", 54, 45);
+//					} else {
+//						alt_up_char_buffer_string(char_buf, "Stable", 54, 45);
+//					}
+				} else if (keyPress == 0x4b) { // 'l'
+					alt_up_char_buffer_clear(char_buf);
+					alt_up_char_buffer_string(char_buf, "Load 1: Active", 10, 41);
+					alt_up_char_buffer_string(char_buf, "Load 2: Active", 10, 43);
+					alt_up_char_buffer_string(char_buf, "Load 3: Active", 10, 45);
+					alt_up_char_buffer_string(char_buf, "Load 4: Active", 10, 47);
+					alt_up_char_buffer_string(char_buf, "Load 5: Active", 10, 49);
+				} else if (keyPress == 0x2c) { // 't'
+					alt_up_char_buffer_clear(char_buf);
+					alt_up_char_buffer_string(char_buf, "5 most recent measurements: ", 10, 41);
+					alt_up_char_buffer_string(char_buf, "Minimum time taken: ", 10, 43);
+					alt_up_char_buffer_string(char_buf, "Maximum time taken: ", 10, 45);
+					alt_up_char_buffer_string(char_buf, "Average time taken: ", 10, 47);
+					alt_up_char_buffer_string(char_buf, "Total active system time: ", 10, 49);
+				}
+
+				alt_up_char_buffer_string(char_buf, "Frequency(Hz)", 4, 4);
+				alt_up_char_buffer_string(char_buf, "52", 10, 7);
+				alt_up_char_buffer_string(char_buf, "50", 10, 12);
+				alt_up_char_buffer_string(char_buf, "48", 10, 17);
+				alt_up_char_buffer_string(char_buf, "46", 10, 22);
+
+				alt_up_char_buffer_string(char_buf, "df/dt(Hz/s)", 4, 26);
+				alt_up_char_buffer_string(char_buf, "60", 10, 28);
+				alt_up_char_buffer_string(char_buf, "30", 10, 30);
+				alt_up_char_buffer_string(char_buf, "0", 10, 32);
+				alt_up_char_buffer_string(char_buf, "-30", 9, 34);
+				alt_up_char_buffer_string(char_buf, "-60", 9, 36);
+
+				alt_up_char_buffer_string(char_buf, "'s' - status", 5, 57);
+				alt_up_char_buffer_string(char_buf, "'l' - loads", 34, 57);
+				alt_up_char_buffer_string(char_buf, "'t' - time", 63, 57);
+			}
 
 			//calculate frequency RoC
-
-			if(i==0){
+			if (i==0) {
 				dfreq[0] = (freq[0]-freq[99]) * 2.0 * freq[0] * freq[99] / (freq[0]+freq[99]);
-			}
-			else{
+			} else {
 				dfreq[i] = (freq[i]-freq[i-1]) * 2.0 * freq[i]* freq[i-1] / (freq[i]+freq[i-1]);
 			}
 
-			if (dfreq[i] > 100.0){
+			if (dfreq[i] > 100.0) {
 				dfreq[i] = 100.0;
 			}
 
@@ -71,8 +142,8 @@ void vgaTask(void *pvParameters) {
 		alt_up_pixel_buffer_dma_draw_box(pixel_buf, 101, 0, 639, 199, 0, 0);
 		alt_up_pixel_buffer_dma_draw_box(pixel_buf, 101, 201, 639, 299, 0, 0);
 
-		for(j=0;j<99;++j){ //i here points to the oldest data, j loops through all the data to be drawn on VGA
-			if (((int)(freq[(i+j)%100]) > MIN_FREQ) && ((int)(freq[(i+j+1)%100]) > MIN_FREQ)){
+		for (j = 0; j < 99; ++j) { //i here points to the oldest data, j loops through all the data to be drawn on VGA
+			if (((int)(freq[(i+j)%100]) > MIN_FREQ) && ((int)(freq[(i+j+1)%100]) > MIN_FREQ)) {
 				//Calculate coordinates of the two data points to draw a line in between
 				//Frequency plot
 				line_freq.x1 = FREQPLT_ORI_X + FREQPLT_GRID_SIZE_X * j;

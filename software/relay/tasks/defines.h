@@ -21,7 +21,7 @@
 #define SHOULDRECONNECTTASK_PRIORITY  1
 #define LOADCTRLTASK_PRIORITY         1
 #define SWITCHPOLLINGTASK_PRIORITY    1
-#define LEDTASK_PRIORITY              ( tskIDLE_PRIORITY + 1)
+#define LEDTASK_PRIORITY              (tskIDLE_PRIORITY + 1)
 #define VGATASK_PRIORITY              1
 
 /* The parameters passed to the reg test tasks.  This is just done to check

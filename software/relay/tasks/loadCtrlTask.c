@@ -11,7 +11,6 @@ void loadCtrlTask(void *pvParameters)
 {
 	while (1)
 	{
-		printf("loadCtrlTask\n");
-		vTaskDelay(1500);
+		;
 	}
 }

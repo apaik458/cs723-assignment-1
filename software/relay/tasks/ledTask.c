@@ -11,7 +11,6 @@ void ledTask(void *pvParameters)
 {
 	while (1)
 	{
-		printf("ledTask\n");
-		vTaskDelay(1000);
+		;
 	}
 }
