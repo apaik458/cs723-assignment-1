@@ -5,6 +5,8 @@
  *      Author: mtay527
  */
 
+#include <stdio.h>
+
 #include <system.h>
 #include <altera_avalon_pio_regs.h>
 
@@ -19,20 +21,22 @@
  * Task to poll SW[4..0] for changes, and send a message to loadCtrlTask.
  */
 void switchPollingTask(void *pvParameters) {
-	unsigned int switchState = 0;
 	unsigned int prevSwitchState = 0;
+	unsigned int switchState = prevSwitchState;
+	printf("switch\n");
 
 	while (1) {
 		switchState = IORD_ALTERA_AVALON_PIO_DATA(SLIDE_SWITCH_BASE) & LOAD_SWITCH_MASK;
 
 		if (switchState != prevSwitchState) {
 			// Switch changed, send state message
-			if (xQueueSend(switchStateQ, (void *)&switchState, 0) == pdPASS) {
+			printf("switch state %d\n", switchState);
+			if (xQueueSend(switchStateQ, &switchState, 0) == pdPASS) {
 				// Added to message queue
 				prevSwitchState = switchState;
 			}
 		}
 
-		vTaskDelay(100);
+		vTaskDelay(20);
 	}
 }

@@ -5,6 +5,8 @@
  *      Author: mtay527
  */
 
+#include <stdio.h>
+
 #include "../freertos/FreeRTOS.h"
 #include "../freertos/task.h"
 
@@ -56,11 +58,12 @@ void loadCtrlTask(void *pvParameters) {
 		xQueueReceive(maintenanceQ, &maintenance, 0); // Check for maintenance state update
 
 		if (maintenance) {
+			printf("maintenance\n");
 			// Maintenance state, obey switches
 			if (maintenance != prevMaintenance
 					|| switchState != prevSwitchState) {
 				// Must update load state
-				if (xQueueSend(loadCtrlQ, (void *)&switchState, 0) == pdPASS) {
+				if (xQueueSend(loadCtrlQ, &switchState, 0) == pdPASS) {
 					// Load states updated, update previous values so another loadCtrlQ isn't sent
 					prevMaintenance = maintenance;
 					prevSwitchState = switchState;
@@ -75,20 +78,17 @@ void loadCtrlTask(void *pvParameters) {
 
 			unsigned int reconnectOrShed;
 			if (xQueueReceive(reconnectOrShedQ, &reconnectOrShed, 0) == pdPASS) {
+				printf("ros %d ss %d sl %d cl %d\n", reconnectOrShed, switchState, shedLoads, connectedLoads);
 				switch (reconnectOrShed) {
 				case RECONNECT:
 					// Reconnect the highest priority load
-					if (!shedLoads)
-						return; // Impossible to receive reconnect command
-
-					shedLoads &= ~(1 << getHighestPriorityBit(shedLoads));
+					if (shedLoads) // There are loads available to shed
+						shedLoads &= ~(1 << getHighestPriorityBit(shedLoads));
 					break;
 				case SHED:
 					// Shed the lowest priority load
-					if (!connectedLoads)
-						return; // Impossible to receive shed command
-
-					shedLoads |= (1 << getLowestPriorityBit(connectedLoads));
+					if (connectedLoads) // There are loads available to connect
+						shedLoads |= (1 << getLowestPriorityBit(connectedLoads));
 					break;
 				}
 			}
@@ -97,11 +97,13 @@ void loadCtrlTask(void *pvParameters) {
 				// Must update load state
 				connectedLoads = switchState & ~shedLoads;
 
-				if (xQueueSend(loadCtrlQ, (void *)&connectedLoads, 0) == pdPASS) {
+				if (xQueueSend(loadCtrlQ, &connectedLoads, 0) == pdPASS) {
 					// Load states updated, update previous values so another loadCtrlQ isn't sent
 					prevShedLoads = shedLoads;
 				}
 			}
 		}
+
+		vTaskDelay(20);
 	}
 }
