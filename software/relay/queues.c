@@ -14,7 +14,7 @@ void initOSDataStructs()
 {
 	// Queues
 	newFreqQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(double));
-	freqMeasureQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(unsigned int));
+	freqMeasureQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(double)*2); 			// sending 2 doubles
 	isStableQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(unsigned int));
 	reconnectOrShedQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(unsigned int));
 	switchStateQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(unsigned int));
@@ -23,5 +23,9 @@ void initOSDataStructs()
 
 	// Semaphores
 	xisStableMutex = xSemaphoreCreateMutex();
+	latencyQ = xQueueCreate(MSG_QUEUE_SIZE, sizeof(unsigned int));
 	shared_resource_sem = xSemaphoreCreateCounting(9999, 1);
+	xfirstTickMutex = xSemaphoreCreateMutex();
+	
+	xfirstTick = -1;
 }

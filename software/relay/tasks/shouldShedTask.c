@@ -43,6 +43,6 @@ void shouldShedTask(void *pvParameters)
 			}
 		}
 
-		vTaskDelay(20);
+		vTaskDelay(1);
 	}
 }

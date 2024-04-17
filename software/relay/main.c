@@ -16,8 +16,6 @@
 
 #define KEY_3(X) (X >> 2) & 0b1
 
-SemaphoreHandle_t xisStableMutex = NULL;
-
 void FreqAnalyserISR(void* context, alt_u32 id) {
 	double temp = SAMPLING_FREQ / (double) IORD(FREQUENCY_ANALYSER_BASE, 0);
 	xQueueSendFromISR(newFreqQ, &temp, pdFALSE);
@@ -42,6 +40,7 @@ void KeyISR(void* context, alt_u32 id) {
 int main(int argc, char* argv[], char* envp[]) {
 	int buttonValue = 0;
 
+	// Create mutexes
 	initOSDataStructs();
 	initGlobals();
 	initCreateTasks();

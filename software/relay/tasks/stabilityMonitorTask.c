@@ -34,34 +34,43 @@ void stabilityMonitorTask(void *pvParameters)
 			// Get Tick
 			currentTick = xTaskGetTickCount();
 
-
 			// check if frequency above threshold
 			uint8_t frequency_stable = instantFreq > THRESHOLD_FREQUENCY ? 1 : 0;
 
-
-
 			// Get ROC
-			float timeDifference = (currentTick - prevTick)/(float)configTICK_RATE_HZ;
-			float freqROC = (instantFreq-prevFreq) /timeDifference;
+			double timeDifference = (currentTick - prevTick)/(float)configTICK_RATE_HZ;
+			double freqROC = (instantFreq-prevFreq) /timeDifference;
 
 			// handle first loop where prevFreq is unset
 			if (prevFreq == -1)
 			{
 				freqROC = 0;
 			}
+			double freqMeasureQData[2] = {instantFreq, freqROC};
+			if (xQueueSend(freqMeasureQ, &freqMeasureQData, 0) != pdPASS) {
+				printf("ERROR: freqMeasureQ Failed to Send\n");
+			}
 			//Check ROC in bounds
 			uint8_t rateOfChangeStabe = freqROC > THRESHOLD_ROC_FREQUENCY ? 1 : 0;
-
 			uint8_t isStable = frequency_stable && rateOfChangeStabe;
 
 			// if stability has changed set the global variable
 			if (isStable != currentStable) {
-				printf("\r\nStability is now %i with a freq of %.2f and ROC of %.3f", isStable, instantFreq, freqROC); //
+				printf("Stability is now %i with a freq of %.2f and ROC of %.3f\n", isStable, instantFreq, freqROC); //
 				
 				if (xSemaphoreTake(xisStableMutex, portMAX_DELAY) == pdPASS) {
 					xisStable = isStable; // Set the global variable
+					xSemaphoreGive(xisStableMutex);
 				}
-				xSemaphoreGive(xisStableMutex);
+
+				// Check if switching to be unstable
+				if (!isStable) {
+					// Save tick to global variable (used for resposne time calculations)
+					if (xSemaphoreTake(xfirstTickMutex, portMAX_DELAY) == pdPASS) {
+						xfirstTick = currentTick; // Set the global variable
+						xSemaphoreGive(xfirstTickMutex);
+					}
+				}
 			
 				// update current state
 				currentStable = isStable;
@@ -71,6 +80,6 @@ void stabilityMonitorTask(void *pvParameters)
 			
 		}
 
-		vTaskDelay(20);
+		vTaskDelay(1);
 	}
 }

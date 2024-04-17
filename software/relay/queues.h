@@ -25,10 +25,15 @@ QueueHandle_t freqMeasureQ;
 QueueHandle_t keyPressQ;
 QueueHandle_t switchStateQ;
 QueueHandle_t loadCtrlQ;
+QueueHandle_t latencyQ;
 
+// Definition of Semaphore
 SemaphoreHandle_t xisStableMutex;
-SemaphoreHandle_t shared_resource_sem; // Definition of Semaphore
+SemaphoreHandle_t shared_resource_sem;
+SemaphoreHandle_t xfirstTickMutex;
 
+// Definition of Tick
+TickType_t xfirstTick;
 void initOSDataStructs(void);
 
 #endif /* QUEUES_H_ */
