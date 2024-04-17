@@ -33,16 +33,15 @@ void FreqAnalyserISR(void* context, alt_u32 id) {
 
 void ButtonISR() {
 	// Send maintenanceQ on KEY3 push
-	unsigned int temp = KEY_3(IORD_ALTERA_AVALON_PIO_EDGE_CAP(PUSH_BUTTON_BASE));
+	unsigned int temp = KEY_3(
+			IORD_ALTERA_AVALON_PIO_EDGE_CAP(PUSH_BUTTON_BASE));
 	if (temp)
 		isMaintenanceState = !isMaintenanceState;
 
 	IOWR_ALTERA_AVALON_PIO_EDGE_CAP(PUSH_BUTTON_BASE, 0x7); // Clear edge capture register
 }
 
-
-void ps2_isr(void* context, alt_u32 id)
-{
+void ps2_isr(void* context, alt_u32 id) {
 	char ascii;
 	int status = 0;
 	unsigned char key = 0;
@@ -50,23 +49,22 @@ void ps2_isr(void* context, alt_u32 id)
 	status = decode_scancode(context, &decode_mode, &key, &ascii);
 
 	if (status == 0) //success
-	{
+			{
 		// print out the result
-		switch (decode_mode)
-		{
-		  case KB_ASCII_MAKE_CODE:
+		switch (decode_mode) {
+		case KB_ASCII_MAKE_CODE:
 			fprintf(lcd, "ASCII: %x\n", key);
 			xQueueSendToBackFromISR(keyPressQ, &key, pdFALSE);
 			break;
-		  case KB_LONG_BINARY_MAKE_CODE:
+		case KB_LONG_BINARY_MAKE_CODE:
 			// do nothing
-		  case KB_BINARY_MAKE_CODE:
+		case KB_BINARY_MAKE_CODE:
 			fprintf(lcd, "MAKE CODE: %x\n", key);
 			xQueueSendToBackFromISR(keyPressQ, &key, pdFALSE);
 			break;
-		  case KB_BREAK_CODE:
+		case KB_BREAK_CODE:
 			// do nothing
-		  default:
+		default:
 			fprintf(lcd, "DEFAULT: %x\n", key);
 			xQueueSendToBackFromISR(keyPressQ, &key, pdFALSE);
 			break;
@@ -79,8 +77,7 @@ void ps2_isr(void* context, alt_u32 id)
 /*
  * Create the demo tasks then start the scheduler.
  */
-int main()
-{
+int main() {
 	lcd = fopen(CHARACTER_LCD_NAME, "w");
 	alt_up_ps2_dev * ps2_device = alt_up_ps2_open_dev(PS2_NAME);
 
@@ -111,7 +108,8 @@ int main()
 
 	vTaskStartScheduler();
 
-	while (1);
+	while (1)
+		;
 
 	return 0;
 }

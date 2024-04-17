@@ -31,7 +31,8 @@ void switchPollingTask(void *pvParameters) {
 	printf("switch\n");
 
 	while (1) {
-		switchState = IORD_ALTERA_AVALON_PIO_DATA(SLIDE_SWITCH_BASE) & LOAD_MASK;
+		switchState =
+				IORD_ALTERA_AVALON_PIO_DATA(SLIDE_SWITCH_BASE) & LOAD_MASK;
 
 		if (switchState != prevSwitchState) {
 			// Switch changed, send state message

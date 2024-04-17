@@ -19,8 +19,7 @@
 
 #include "shouldShedTask.h"
 
-void shouldShedTask(void *pvParameters)
-{
+void shouldShedTask(void *pvParameters) {
 	uint8_t currentlyStable = 1;
 	for (;;) {
 		if (!isMaintenanceState) {

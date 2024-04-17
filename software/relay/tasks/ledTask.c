@@ -22,15 +22,14 @@
  * Use red LEDs to display loads which are connected, and green to show loads
  * which are shed.
  */
-void ledTask(void *pvParameters)
-{
+void ledTask(void *pvParameters) {
 	unsigned int loadCtrl = 0;
 
-	while (1)
-	{
+	while (1) {
 		if (xQueueReceive(loadCtrlQ, &loadCtrl, 0) == pdPASS) {
-		    IOWR_ALTERA_AVALON_PIO_DATA(RED_LEDS_BASE, loadCtrl);
-		    IOWR_ALTERA_AVALON_PIO_DATA(GREEN_LEDS_BASE, (~loadCtrl & LOAD_MASK));
+			IOWR_ALTERA_AVALON_PIO_DATA(RED_LEDS_BASE, loadCtrl);
+			IOWR_ALTERA_AVALON_PIO_DATA(GREEN_LEDS_BASE,
+					(~loadCtrl & LOAD_MASK));
 		}
 	}
 }
