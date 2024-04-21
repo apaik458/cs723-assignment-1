@@ -40,10 +40,9 @@ void shouldReconnectTask(void *pvParameters) {
 				// If it's still stable start reconnecting
 				if (currentlyStable == 1) {
 					unsigned int reconnect = RECONNECT;
-					if (xQueueSend(reconnectOrShedQ, &reconnect, 0) == pdPASS) {
-						// printf("YESS"); // used to confirm that it's being sent
+					if (xQueueSend(reconnectOrShedQ, &reconnect, 0) != pdPASS) {
+                        printf("FAILED: Reconnect send queue");
 					}
-					//printf("R");
 				}
 			} else {
 				// else wait for 5 ms cause not being too greedy

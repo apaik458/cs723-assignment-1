@@ -31,10 +31,6 @@ void shouldShedTask(void *pvParameters) {
 			if (currentlyStable == 0) {
 				unsigned int shed = SHED;
 				xQueueSend(reconnectOrShedQ, &shed, 0);
-				//printf("S");
-
-				// Start timer do delay next (potential) shedding by 500ms
-				// TODO: switch from delay to proper timer, this should be fine for the demo though
 				vTaskDelay(pdMS_TO_TICKS(500));
 			} else {
 				// else wait for 5 ms cause not being too greedy

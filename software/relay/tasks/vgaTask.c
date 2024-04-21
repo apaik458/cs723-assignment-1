@@ -69,7 +69,7 @@ void vgaTask(void *pvParameters) {
 	alt_up_char_buffer_string(char_buf, "'t' - time", 63, 57);
 
 	double freq[100], dfreq[100];
-	int i = 99, j = 0;
+	int i = 99;
 	Line line_freq, line_roc;
 
 	unsigned char prevKeyPress = KEY_S;
@@ -85,7 +85,7 @@ void vgaTask(void *pvParameters) {
 	unsigned int minLatency = 200;
 	unsigned int maxLatency = 0;
 	float averageLatency = 0;
-	unsigned int systemUptime = 0;
+	unsigned int systemUptime;
 
 	unsigned int averageTotal = 0;
 	unsigned int receivedLatency = 0;

@@ -23,7 +23,7 @@ void stabilityMonitorTask(void *pvParameters) {
 	uint8_t currentStable = -1; // start with invalid stability to force update
 	double prevFreq = -1;
 	double instantFreq = -1;
-	double freqROC = 0;
+	double freqROC;
 	double prevFreqROC = 0;
 
 	TickType_t currentTick;
@@ -41,12 +41,10 @@ void stabilityMonitorTask(void *pvParameters) {
 			// Get ROC
 			freqROC = (instantFreq - prevFreq) * 2.0 * instantFreq * prevFreq / (instantFreq + prevFreq);
 
-			//Debounce ROC (if it stays negative then shouldn't switch back to stable
+			//Debounce ROC
 			if (prevFreqROC < 0 && freqROC < 0){
 				freqROC = prevFreqROC;
 			}
-			prevFreqROC = freqROC;
-//			printf("ROC: %f | %f | %f\n", instantFreq, prevFreq, freqROC);
 
 			// handle first loop where prevFreq is unset
 			if (prevFreq == -1) {
@@ -56,7 +54,6 @@ void stabilityMonitorTask(void *pvParameters) {
 			prevFreqROC = freqROC;
 			prevFreq = instantFreq;
 
-			double freqMeasureQData[2] = { instantFreq, freqROC};
 			if (xQueueSend(freqMeasureQ, &instantFreq, 0) != pdPASS) {
 				printf("ERROR: freqMeasureQ Failed to Send\n");
 			}

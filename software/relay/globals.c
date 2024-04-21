@@ -10,4 +10,5 @@
 void initGlobals() {
 	isMaintenanceState = 0;
 	xisStable = 1; // Default to stable state
+    xfirstTick = -1; // Default to imposible state
 }

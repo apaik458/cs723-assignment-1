@@ -30,11 +30,8 @@ QueueHandle_t vgaLoadsQ;
 
 // Definition of Semaphore
 SemaphoreHandle_t xisStableMutex;
-SemaphoreHandle_t shared_resource_sem;
 SemaphoreHandle_t xfirstTickMutex;
 
-// Definition of Tick
-TickType_t xfirstTick;
 void initOSDataStructs(void);
 
 #endif /* QUEUES_H_ */
